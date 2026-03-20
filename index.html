@@ -268,7 +268,7 @@
                 <ul>
                     <li>本服務適用於 <strong>新店家</strong> 與 <strong>現有店家擴點</strong> 申請。</li>
                     <li>請依序填寫 <strong>第一志願、第二志願、第三志願</strong>，方便總部評估與媒合。</li>
-                    <li>若該區域目前額滿，仍可勾選 <strong>候補</strong>，後續如有名額將優先通知。</li>
+                    <li>三個志願中，<strong>最多只能選 1 個候補區域</strong>；其餘志願請優先選擇仍有可開名額的區域。</li>
                     <li>總部於合約有效期間內，<strong>最多提供 3 個物件</strong> 供選擇。</li>
                     <li>場地是否可合法經營，仍需由 <strong>專業建築師評估</strong> 是否具備變更為 D1 之資格。</li>
                     <li>若為需辦理合法 D1 變更之場地，<strong>平均花費約 50～100 萬元</strong>（依實際場況與建築師評估為準）。</li>
@@ -392,8 +392,8 @@
                         <input type="checkbox" id="waitlist" name="waitlist" value="是">
                         <label for="waitlist" style="font-weight: normal; margin: 0;">若志願區域額滿，願意候補</label>
                     </div>
-                    <div class="helper-text">若選到「可候補」區域，最多只能填 1 個候補區域，另外兩個志願需留空。</div>
-                    <div class="field-error" id="waitlistRuleError">候補區域最多只能選 1 個，且若有候補區域，另外兩個志願需留空。</div>
+                    <div class="helper-text">三個志願中，最多只能選 1 個「可候補」區域；其他志願請填仍有可開名額的區域。</div>
+                    <div class="field-error" id="waitlistRuleError">候補區域最多只能選 1 個，其他志願不可再選候補區域。</div>
                 </div>
                 
                 <!-- 預算範圍 -->
@@ -527,7 +527,7 @@
 
             const waitlistSelections = selections.filter(item => isWaitlistArea(item.city, item.district));
 
-            if (waitlistSelections.length > 1 || (waitlistSelections.length === 1 && selections.length > 1)) {
+            if (waitlistSelections.length > 1) {
                 waitlistRuleError.style.display = 'block';
                 waitlistRuleError.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return;
