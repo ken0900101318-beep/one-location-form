@@ -468,6 +468,9 @@
                 "仁武區": "可開1家", "三民區": "可開2家", "苓雅區": "可開2家", "前鎮區": "可開2家", "左營區": "可開2家"
             }
         };
+
+        // 部署 GAS Web App 後，將網址貼到這裡
+        const GAS_WEB_APP_URL = '';
         
         // 縣市選擇器陣列
         const citySelectors = ['city1', 'city2', 'city3'];
@@ -602,10 +605,30 @@
             };
             
             try {
-                // 儲存到 localStorage（暫時方案）
-                const submissions = JSON.parse(localStorage.getItem('locationSubmissions') || '[]');
-                submissions.push(formData);
-                localStorage.setItem('locationSubmissions', JSON.stringify(submissions));
+                if (GAS_WEB_APP_URL) {
+                    const payload = new URLSearchParams();
+                    Object.entries(formData).forEach(([key, value]) => {
+                        payload.append(key, typeof value === 'object' ? JSON.stringify(value) : value);
+                    });
+
+                    const response = await fetch(GAS_WEB_APP_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                        },
+                        body: payload.toString()
+                    });
+
+                    const result = await response.json();
+                    if (!result.success) {
+                        throw new Error(result.message || '送出失敗');
+                    }
+                } else {
+                    // 尚未串接 GAS 前，先存 localStorage 供本機測試
+                    const submissions = JSON.parse(localStorage.getItem('locationSubmissions') || '[]');
+                    submissions.push(formData);
+                    localStorage.setItem('locationSubmissions', JSON.stringify(submissions));
+                }
                 
                 // 顯示成功訊息
                 successMsg.style.display = 'block';
