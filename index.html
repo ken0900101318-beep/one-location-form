@@ -436,9 +436,13 @@
         };
 
         const waitlistAreas = {
-            "新北市": ["板橋區", "樹林區", "蘆洲區", "三重區"],
+            "新北市": ["板橋區", "樹林區", "蘆洲區"],
             "桃園市": ["桃園區", "中壢區"],
             "台南市": ["東區", "中西區"]
+        };
+
+        const closedAreas = {
+            "新北市": ["三重區"]
         };
 
         const availabilityLabels = {
@@ -450,7 +454,7 @@
             "新北市": {
                 "永和區": "可開3家", "新店區": "可開3家", "土城區": "可開3家", "中和區": "可開1家", "新莊區": "可開2家",
                 "樹林區": "可候補", "蘆洲區": "可候補", "板橋區": "可候補", "淡水區": "可開3家", "三峽區": "可開2家",
-                "三重區": "可候補", "汐止區": "可開4家", "林口區": "可開3家"
+                "三重區": "已額滿", "汐止區": "可開4家", "林口區": "可開3家"
             },
             "桃園市": {
                 "桃園區": "可候補", "中壢區": "可候補", "平鎮區": "可開3家", "八德區": "可開3家", "龜山區": "可開1家",
@@ -469,6 +473,37 @@
         const citySelectors = ['city1', 'city2', 'city3'];
         const districtSelectors = ['district1', 'district2', 'district3'];
         
+        function refreshWaitlistLocks() {
+            const selections = districtSelectors.map((districtId, index) => ({
+                city: document.getElementById(citySelectors[index]).value,
+                district: document.getElementById(districtId).value
+            })).filter(item => item.city && item.district);
+
+            const chosenWaitlist = selections.find(item => waitlistAreas[item.city] && waitlistAreas[item.city].includes(item.district));
+
+            districtSelectors.forEach((districtId, index) => {
+                const city = document.getElementById(citySelectors[index]).value;
+                const select = document.getElementById(districtId);
+                if (!city || select.disabled) return;
+
+                Array.from(select.options).forEach(option => {
+                    if (!option.value) return;
+                    const district = option.value;
+                    const isClosed = closedAreas[city] && closedAreas[city].includes(district);
+                    const isWaitlist = waitlistAreas[city] && waitlistAreas[city].includes(district);
+                    const isCurrentValue = select.value === district;
+
+                    if (isClosed) {
+                        option.disabled = true;
+                    } else if (chosenWaitlist && isWaitlist && !isCurrentValue) {
+                        option.disabled = true;
+                    } else {
+                        option.disabled = false;
+                    }
+                });
+            });
+        }
+
         // 為每個縣市選擇器設定事件監聽
         citySelectors.forEach((cityId, index) => {
             const citySelect = document.getElementById(cityId);
@@ -483,6 +518,7 @@
                     districts[selectedCity].forEach(district => {
                         const option = document.createElement('option');
                         option.value = district;
+                        const isClosed = closedAreas[selectedCity] && closedAreas[selectedCity].includes(district);
                         let suffix = '';
                         if (selectedCity === '台中市') {
                             suffix = '（不限家數）';
@@ -492,13 +528,17 @@
                             suffix = '（可候補）';
                         }
                         option.textContent = `${district}${suffix}`;
+                        if (isClosed) option.disabled = true;
                         districtSelect.appendChild(option);
                     });
+                    refreshWaitlistLocks();
                 } else {
                     districtSelect.disabled = true;
                     districtSelect.innerHTML = '<option value="">請先選擇縣市</option>';
                 }
             });
+
+            districtSelect.addEventListener('change', refreshWaitlistLocks);
         });
         
         function isWaitlistArea(city, district) {
