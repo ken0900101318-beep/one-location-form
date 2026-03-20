@@ -611,12 +611,8 @@
                         payload.append(key, typeof value === 'object' ? JSON.stringify(value) : value);
                     });
 
-                    const response = await fetch(GAS_WEB_APP_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                        },
-                        body: payload.toString()
+                    const response = await fetch(`${GAS_WEB_APP_URL}?${payload.toString()}`, {
+                        method: 'GET'
                     });
 
                     const result = await response.json();
