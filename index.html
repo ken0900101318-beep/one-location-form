@@ -48,6 +48,38 @@
             padding: 40px 30px;
         }
         
+        .notice-box {
+            background: #f8f9ff;
+            border: 2px solid #d9e2ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .notice-box h2 {
+            font-size: 1.2em;
+            color: #667eea;
+            margin-bottom: 12px;
+        }
+        
+        .notice-box ul {
+            margin-left: 20px;
+            color: #444;
+        }
+        
+        .notice-box li {
+            margin-bottom: 8px;
+        }
+        
+        .notice-highlight {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 15px;
+            margin-top: 15px;
+            border-radius: 6px;
+            color: #6b5600;
+        }
+        
         .form-group {
             margin-bottom: 25px;
         }
@@ -224,6 +256,22 @@
         </div>
         
         <div class="form-content">
+            <div class="notice-box">
+                <h2>📌 申請前請先閱讀</h2>
+                <ul>
+                    <li>本服務適用於 <strong>新店家</strong> 與 <strong>現有店家擴點</strong> 申請。</li>
+                    <li>請依序填寫 <strong>第一志願、第二志願、第三志願</strong>，方便總部評估與媒合。</li>
+                    <li>若該區域目前額滿，仍可勾選 <strong>候補</strong>，後續如有名額將優先通知。</li>
+                    <li>總部於合約有效期間內，<strong>最多提供 3 個物件</strong> 供選擇。</li>
+                    <li>場地是否可合法經營，仍需由 <strong>專業建築師評估</strong> 是否具備變更為 D1 之資格。</li>
+                    <li>若為需辦理合法 D1 變更之場地，<strong>平均花費約 50～100 萬元</strong>（依實際場況與建築師評估為準）。</li>
+                    <li>送出表單後，僅代表提出需求，<strong>不代表保留名額或完成簽約</strong>。</li>
+                </ul>
+                <div class="notice-highlight">
+                    ⚠️ 若區域未在規劃名額內，或條件不符，總部將視實際狀況安排候補或另行建議區域。
+                </div>
+            </div>
+            
             <div class="success-message" id="successMessage">
                 ✅ 申請已送出！我們會盡快與您聯繫。
             </div>
@@ -233,6 +281,13 @@
             </div>
             
             <form id="applicationForm">
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="agreeRules" name="agreeRules" required>
+                        <label for="agreeRules" style="font-weight: normal; margin: 0;">我已閱讀並了解以上場地開發服務規則</label>
+                    </div>
+                </div>
+                
                 <!-- 身份 -->
                 <div class="form-group">
                     <label>您的身份 <span class="required">*</span></label>
