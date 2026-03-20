@@ -427,9 +427,33 @@
         };
 
         const waitlistAreas = {
-            "新北市": ["板橋區", "樹林區", "蘆洲區"],
+            "新北市": ["板橋區", "樹林區", "蘆洲區", "三重區"],
             "桃園市": ["桃園區", "中壢區"],
             "台南市": ["東區", "中西區"]
+        };
+
+        const availabilityLabels = {
+            "台北市": {
+                "大安區": "可開4家", "內湖區": "可開4家", "士林區": "可開3家", "文山區": "可開3家", "北投區": "可開4家",
+                "中山區": "可開3家", "信義區": "可開4家", "松山區": "可開3家", "萬華區": "可開3家", "中正區": "可開2家",
+                "南港區": "可開3家", "大同區": "可開3家"
+            },
+            "新北市": {
+                "永和區": "可開3家", "新店區": "可開3家", "土城區": "可開3家", "中和區": "可開1家", "新莊區": "可開2家",
+                "樹林區": "可候補", "蘆洲區": "可候補", "板橋區": "可候補", "淡水區": "可開3家", "三峽區": "可開2家",
+                "三重區": "可候補", "汐止區": "可開4家", "林口區": "可開3家"
+            },
+            "桃園市": {
+                "桃園區": "可候補", "中壢區": "可候補", "平鎮區": "可開3家", "八德區": "可開3家", "龜山區": "可開1家",
+                "楊梅區": "可開2家", "蘆竹區": "可開2家", "大園區": "可開1家", "觀音區": "可開1家"
+            },
+            "台中市": "不限家數",
+            "台南市": {
+                "東區": "可候補", "永康區": "可開1家", "中西區": "可候補"
+            },
+            "高雄市": {
+                "仁武區": "可開1家", "三民區": "可開2家", "苓雅區": "可開2家", "前鎮區": "可開2家", "左營區": "可開2家"
+            }
         };
         
         // 縣市選擇器陣列
@@ -450,8 +474,15 @@
                     districts[selectedCity].forEach(district => {
                         const option = document.createElement('option');
                         option.value = district;
-                        const isWaitlist = waitlistAreas[selectedCity] && waitlistAreas[selectedCity].includes(district);
-                        option.textContent = isWaitlist ? `${district}（可候補）` : district;
+                        let suffix = '';
+                        if (selectedCity === '台中市') {
+                            suffix = '（不限家數）';
+                        } else if (availabilityLabels[selectedCity] && availabilityLabels[selectedCity][district]) {
+                            suffix = `（${availabilityLabels[selectedCity][district]}）`;
+                        } else if (waitlistAreas[selectedCity] && waitlistAreas[selectedCity].includes(district)) {
+                            suffix = '（可候補）';
+                        }
+                        option.textContent = `${district}${suffix}`;
                         districtSelect.appendChild(option);
                     });
                 } else {
