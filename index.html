@@ -214,6 +214,13 @@
             margin-bottom: 20px;
         }
         
+        .field-error {
+            color: #dc3545;
+            font-size: 0.9em;
+            margin-top: 8px;
+            display: none;
+        }
+        
         .helper-text {
             font-size: 0.85em;
             color: #666;
@@ -385,6 +392,8 @@
                         <input type="checkbox" id="waitlist" name="waitlist" value="是">
                         <label for="waitlist" style="font-weight: normal; margin: 0;">若志願區域額滿，願意候補</label>
                     </div>
+                    <div class="helper-text">若選到「可候補」區域，最多只能填 1 個候補區域，另外兩個志願需留空。</div>
+                    <div class="field-error" id="waitlistRuleError">候補區域最多只能選 1 個，且若有候補區域，另外兩個志願需留空。</div>
                 </div>
                 
                 <!-- 預算範圍 -->
@@ -492,6 +501,10 @@
             });
         });
         
+        function isWaitlistArea(city, district) {
+            return !!(waitlistAreas[city] && waitlistAreas[city].includes(district));
+        }
+
         // 表單提交
         document.getElementById('applicationForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -499,10 +512,26 @@
             const submitBtn = document.getElementById('submitBtn');
             const successMsg = document.getElementById('successMessage');
             const errorMsg = document.getElementById('errorMessage');
+            const waitlistRuleError = document.getElementById('waitlistRuleError');
             
             // 隱藏訊息
             successMsg.style.display = 'none';
             errorMsg.style.display = 'none';
+            waitlistRuleError.style.display = 'none';
+            
+            const selections = [
+                { city: document.getElementById('city1').value, district: document.getElementById('district1').value },
+                { city: document.getElementById('city2').value, district: document.getElementById('district2').value },
+                { city: document.getElementById('city3').value, district: document.getElementById('district3').value }
+            ].filter(item => item.city && item.district);
+
+            const waitlistSelections = selections.filter(item => isWaitlistArea(item.city, item.district));
+
+            if (waitlistSelections.length > 1 || (waitlistSelections.length === 1 && selections.length > 1)) {
+                waitlistRuleError.style.display = 'block';
+                waitlistRuleError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
             
             // 禁用按鈕
             submitBtn.disabled = true;
