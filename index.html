@@ -463,12 +463,40 @@
                     </div>
                 </div>
                 
+                <!-- 場地方案（可複選）-->
+                <div class="form-group">
+                    <label>希望場地方案 <span class="required">*</span> <span style="color:#999;font-size:12px;font-weight:normal;">（可複選）</span></label>
+                    <div class="checkbox-group" style="display:flex;flex-direction:column;gap:8px;">
+                        <div class="checkbox-option" style="display:flex;align-items:flex-start;gap:8px;">
+                            <input type="checkbox" id="planA" name="planA" value="A" style="margin-top:4px;">
+                            <label for="planA" style="font-weight: normal; margin: 0;">
+                                <b>方案 A：僅限 D1 類組場地</b>
+                                <div style="font-size:12px;color:#666;margin-top:2px;">須具備或可變更為 D1 資格，以利合法經營</div>
+                            </label>
+                        </div>
+                        <div class="checkbox-option" style="display:flex;align-items:flex-start;gap:8px;">
+                            <input type="checkbox" id="planB" name="planB" value="B" style="margin-top:4px;">
+                            <label for="planB" style="font-weight: normal; margin: 0;">
+                                <b>方案 B：不限 D1 類組場地</b>
+                                <div style="font-size:12px;color:#666;margin-top:2px;">一般商業空間或屋主現況出租，自負經營風險</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 身分證/統編 -->
+                <div class="form-group">
+                    <label for="idNumber">身分證字號 / 公司統一編號（選填）</label>
+                    <input type="text" id="idNumber" name="idNumber" placeholder="個人請填身分證、公司請填統編">
+                    <div style="font-size:12px;color:#999;margin-top:4px;">後續正式簽約會用到，先填好可省一步</div>
+                </div>
+
                 <!-- 補充說明 -->
                 <div class="form-group">
                     <label for="notes">補充說明（選填）</label>
                     <textarea id="notes" name="notes" placeholder="其他需求或想說的話..."></textarea>
                 </div>
-                
+
                 <button type="submit" class="submit-btn" id="submitBtn">
                     送出申請
                 </button>
@@ -521,8 +549,8 @@
             }
         };
 
-        // 部署 GAS Web App 後，將網址貼到這裡
-        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzXEj0X_Mzle4fzqEysisM6IEcVz7H758sBemMatMTFdsHMeDl_J7mDAqixbisxuNV2/exec';
+        // ONE 管理系統 API 端點（直接送入後台 customers）
+        const API_URL = 'https://one-management-v3-web-production.up.railway.app/api/location-inquiries';
         
         // 縣市選擇器陣列
         const citySelectors = ['city1', 'city2', 'city3'];
@@ -633,49 +661,37 @@
             submitBtn.textContent = '送出中...';
             
             // 收集表單資料
+            const plans = [];
+            if (document.getElementById('planA').checked) plans.push('A');
+            if (document.getElementById('planB').checked) plans.push('B');
+
             const formData = {
-                timestamp: new Date().toISOString(),
                 identity: document.querySelector('input[name="identity"]:checked').value,
                 name: document.getElementById('name').value,
                 phone: document.getElementById('phone').value,
                 lineId: document.getElementById('lineId').value,
-                region1: {
-                    city: document.getElementById('city1').value,
-                    district: document.getElementById('district1').value
-                },
-                region2: {
-                    city: document.getElementById('city2').value,
-                    district: document.getElementById('district2').value
-                },
-                region3: {
-                    city: document.getElementById('city3').value,
-                    district: document.getElementById('district3').value
-                },
+                city1: document.getElementById('city1').value,
+                district1: document.getElementById('district1').value,
+                city2: document.getElementById('city2').value,
+                district2: document.getElementById('district2').value,
+                city3: document.getElementById('city3').value,
+                district3: document.getElementById('district3').value,
                 waitlist: document.getElementById('waitlist').checked ? '是' : '否',
                 budget: document.querySelector('input[name="budget"]:checked').value,
-                notes: document.getElementById('notes').value
+                plans: plans,
+                idNumber: document.getElementById('idNumber').value,
+                notes: document.getElementById('notes').value,
             };
-            
+
             try {
-                if (GAS_WEB_APP_URL) {
-                    const payload = new URLSearchParams();
-                    Object.entries(formData).forEach(([key, value]) => {
-                        payload.append(key, typeof value === 'object' ? JSON.stringify(value) : value);
-                    });
-
-                    const response = await fetch(`${GAS_WEB_APP_URL}?${payload.toString()}`, {
-                        method: 'GET'
-                    });
-
-                    const result = await response.json();
-                    if (!result.success) {
-                        throw new Error(result.message || '送出失敗');
-                    }
-                } else {
-                    // 尚未串接 GAS 前，先存 localStorage 供本機測試
-                    const submissions = JSON.parse(localStorage.getItem('locationSubmissions') || '[]');
-                    submissions.push(formData);
-                    localStorage.setItem('locationSubmissions', JSON.stringify(submissions));
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+                });
+                const result = await response.json();
+                if (!result.success) {
+                    throw new Error(result.error || '送出失敗');
                 }
                 
                 // 顯示成功訊息
