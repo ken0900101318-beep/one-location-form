@@ -484,6 +484,20 @@
                     </div>
                 </div>
 
+                <!-- 期望坪數 -->
+                <div class="form-group">
+                    <label for="expectedArea">期望坪數（選填）</label>
+                    <input type="text" id="expectedArea" name="expectedArea" placeholder="例如：30-50 坪 / 至少 40 坪">
+                    <div style="font-size:12px;color:#999;margin-top:4px;">寫入合約後，開發時以此範圍為準，減少爭議</div>
+                </div>
+
+                <!-- 可接受月租範圍 -->
+                <div class="form-group">
+                    <label for="expectedRent">可接受月租範圍（選填）</label>
+                    <input type="text" id="expectedRent" name="expectedRent" placeholder="例如：5-8 萬 / 上限 10 萬">
+                    <div style="font-size:12px;color:#999;margin-top:4px;">寫入合約後，開發時以此範圍為準，減少爭議</div>
+                </div>
+
                 <!-- 身分證/統編 -->
                 <div class="form-group">
                     <label for="idNumber">身分證字號 / 公司統一編號（選填）</label>
@@ -679,6 +693,8 @@
                 waitlist: document.getElementById('waitlist').checked ? '是' : '否',
                 budget: document.querySelector('input[name="budget"]:checked').value,
                 plans: plans,
+                expectedArea: document.getElementById('expectedArea').value,
+                expectedRent: document.getElementById('expectedRent').value,
                 idNumber: document.getElementById('idNumber').value,
                 notes: document.getElementById('notes').value,
             };
